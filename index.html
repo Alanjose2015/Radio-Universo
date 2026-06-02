@@ -207,14 +207,13 @@
             <div id="streamsGrid" class="streams-grid"></div>
         </div>
 
-            </div>
-                                                  
-<script>
+                </div>
+                <script>
     // Variables globales sincronizadas con el almacenamiento del navegador
     let listaStreams = JSON.parse(localStorage.getItem('multiStreamList')) || [];
     let likesData = JSON.parse(localStorage.getItem('likesData')) || {};
 
-    // Al cargar la página, se resetean los inputs para evitar datos cacheados
+    // Al cargar la página, se resetean los inputs para evitar datos guardados
     document.addEventListener("DOMContentLoaded", () => {
         if(document.getElementById('usuario')) document.getElementById('usuario').value = "";
         if(document.getElementById('clave')) document.getElementById('clave').value = "";
@@ -296,35 +295,20 @@
         verificarCampos();
     }
 
-    // 6. Extracción de IDs de YouTube corregida al 100%
+    // 6. EXTRACCIÓN DE ID UNIVERSAL MEDIANTE EXPRESIÓN REGULAR NATIVA
     function extraerId(url) {
+        if (!url) return null;
         try {
-            if (!url) return null;
+            // Expresión regular para aislar el ID de 11 caracteres de YouTube en cualquier formato
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=|live\/)([^#\&\?]*).*/;
+            const match = url.match(regExp);
             
-            // Soporte para enlaces cortos youtu.be/ID
-            if (url.includes('youtu.be/')) {
-                let id = url.split('youtu.be/')[1];
-                return id ? id.split(/[?#]/)[0] : null;
-            }
-            
-            // Soporte para transmisiones en vivo ://youtube.com
-            if (url.includes('/live/')) {
-                let id = url.split('/live/')[1];
-                return id ? id.split(/[?#]/)[0] : null;
-            }
-            
-            // Soporte para enlaces estándar ://youtube.com
-            if (url.includes('v=')) {
-                return new URLSearchParams(new URL(url).search).get('v');
-            }
-            
-            // Soporte para enlaces incrustados directos /embed/ID
-            if (url.includes('/embed/')) {
-                let id = url.split('/embed/')[1];
-                return id ? id.split(/[?#]/)[0] : null;
+            // Si hay coincidencia y tiene los 11 caracteres exactos, los devuelve
+            if (match && match[2].length === 11) {
+                return match[2];
             }
         } catch (e) {
-            console.error("Error al procesar la URL de YouTube:", e);
+            console.error("Error al extraer el ID de video:", e);
         }
         return null;
     }
@@ -337,8 +321,8 @@
             const vid = document.getElementById(`vid-${stream.id}`);
             if (vid) {
                 if (vid.tagName === 'IFRAME') {
-                    let baseUrl = vid.src.split('?')[0];
-                    vid.src = `${baseUrl}?autoplay=1&mute=1&enablejsapi=1`;
+                    let srcLimpio = vid.src.split('?')[0];
+                    vid.src = `${srcLimpio}?autoplay=1&mute=1&enablejsapi=1`;
                 } else if (vid.tagName === 'VIDEO') {
                     vid.currentTime = 0;
                     vid.muted = true;
@@ -346,7 +330,7 @@
                 }
             }
         });
-        alert("🔊 Transmisiones iniciadas en segundo plano de manera muteada.");
+        alert("🔊 Transmisiones iniciadas de manera muteada.");
     }
 
     // 8. Control interactivo de likes
@@ -392,7 +376,7 @@
         localStorage.setItem('likesData', JSON.stringify(likesData));
     }
 
-    // 11. Renderizado e inyección de la interfaz de reproducción de videos
+    // 11. Renderizado Dinámico de la Grilla de Videos
     function renderizarTodasLasTransmisiones() {
         const grid = document.getElementById('streamsGrid');
         if (!grid) return;
@@ -413,10 +397,10 @@
 
             let reproductorHTML = "";
             if (videoId) {
-                // Si es YouTube, se le inserta el iframe correcto de inserción
+                // Inserta el reproductor nativo embebido de YouTube de forma correcta
                 reproductorHTML = `<iframe id="vid-${stream.id}" width="100%" height="200" src="https://youtube.com{videoId}?enablejsapi=1&rel=0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen style="border-radius:6px; background:#000;"></iframe>`;
             } else {
-                // Si es un enlace directo de video nativo (.mp4, .m3u8, etc)
+                // Respaldo por si se ingresa un enlace directo a archivo .mp4
                 reproductorHTML = `<video id="vid-${stream.id}" src="${stream.url}" controls width="100%" height="200" style="border-radius:6px; background:#000;"></video>`;
             }
 
@@ -438,4 +422,3 @@
 </script>
 </body>
 </html>
-    
