@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel de Control - Multitransmisión Video</title>
+    <title>UNIVERSO STREAM - Multitransmisión en Vivo</title>
     <style>
         * {
             box-sizing: border-box;
@@ -13,7 +13,7 @@
             background-color: #f1f2f6;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
             min-height: 100vh;
             margin: 0;
             padding: 20px;
@@ -21,12 +21,32 @@
         .radio-card {
             background-color: #ffffff;
             width: 100%;
-            max-width: 500px;
+            max-width: 1400px;
             padding: 30px;
             border-radius: 24px;
             box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
             border: 1px solid #e4e7eb;
         }
+
+        /* --- TITULO PRINCIPAL --- */
+        .main-title {
+            text-align: center;
+            font-size: 32px;
+            font-weight: 900;
+            color: #1e293b;
+            margin: 0 0 10px 0;
+            background: linear-gradient(45deg, #3b82f6, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .main-subtitle {
+            text-align: center;
+            color: #64748b;
+            font-size: 15px;
+            margin-bottom: 25px;
+        }
+
         .login-container, .register-container, .recover-container, .radio-container {
             display: none;
         }
@@ -46,21 +66,119 @@
             margin-bottom: 25px;
         }
         
-        /* Contenedor del Reproductor de Video Adaptable (16:9) */
+        /* --- CONTENEDOR GENERAL PARA VARIOS STREAMS --- */
+        .all-streams-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        /* --- ESTILO PARA CADA TRANSMISIÓN INDIVIDUAL --- */
+        .stream-card {
+            background-color: #f8fafc;
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .stream-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .stream-title {
+            font-weight: 700;
+            color: #1e293b;
+            font-size: 16px;
+        }
+
+        /* Reproductor de Video */
         .video-wrapper {
             position: relative;
-            padding-bottom: 56.25%;
+            padding-bottom: 56.25%; /* 16:9 */
             height: 0;
             overflow: hidden;
-            border-radius: 16px;
-            background-color: #000000;
-            margin-bottom: 25px;
+            border-radius: 12px;
+            background-color: #000;
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
         .video-wrapper iframe, .video-wrapper video {
             position: absolute;
             top: 0;
             left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* Controles: Volumen y Like */
+        .stream-controls {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 0 5px;
+        }
+        .volume-control {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .volume-control label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #475569;
+        }
+        .volume-slider {
+            width: 100px;
+            height: 6px;
+            border-radius: 5px;
+            background: #cbd5e1;
+            outline: none;
+            -webkit-appearance: none;
+        }
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background: #3b82f6;
+            cursor: pointer;
+        }
+        .btn-like {
+            background: none;
+            border: none;
+            font-size: 14px;
+            font-weight: 700;
+            color: #ef4444;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 6px 12px;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+        .btn-like:hover {
+            background-color: #fee2e2;
+        }
+        .like-count {
+            font-weight: bold;
+        }
+
+        /* Chat en Vivo */
+        .chat-wrapper {
+            height: 300px;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+            background-color: white;
+        }
+        .chat-wrapper iframe {
             width: 100%;
             height: 100%;
             border: none;
@@ -146,11 +264,24 @@
         .btn-action { border: none; padding: 8px 12px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; }
         .btn-connect { background-color: #3b82f6; color: white; }
         .btn-delete { background-color: #fee2e2; color: #ef4444; }
+
+        /* Mensaje vacío */
+        .empty-state {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 50px;
+            color: #94a3b8;
+            font-size: 16px;
+        }
     </style>
 </head>
 <body>
 
     <div class="radio-card">
+        <!-- TITULO PRINCIPAL DEL SISTEMA -->
+        <h1 class="main-title">UNIVERSO STREAM</h1>
+        <p class="main-subtitle">Tu plataforma de Multitransmisión en Vivo</p>
+
         <!-- 1. PANTALLA DE LOGIN -->
         <div id="loginBox" class="login-container">
             <span class="radio-header-icon">🔒</span>
@@ -206,245 +337,28 @@
         <!-- 4. PANTALLA DEL REPRODUCTOR (Protegido) -->
         <div id="radioBox" class="radio-container">
             <div class="text-center">
-                <span class="radio-header-icon">📺</span>
-                <h2>Multitransmisión</h2>
-                <span class="status-badge" id="radioStatus">Seleccioná una señal</span>
+                <span class="radio-header-icon">🌌</span>
+                <h2>Panel de Control</h2>
+                <span class="status-badge" id="radioStatus">Todas las señales activas</span>
             </div>
             
-            <!-- Ventana de Video Adaptable -->
-            <div class="video-wrapper" id="videoPlayerContainer">
-                <div style="color: white; text-align: center; padding-top: 25%; font-size: 14px;">Ninguna señal activa</div>
+            <!-- AQUÍ SE MUESTRAN TODOS LOS STREAMS AL MISMO TIEMPO -->
+            <div id="allStreamsView" class="all-streams-container">
+                <div class="empty-state">Agregá una transmisión para comenzar</div>
             </div>
 
-            <div class="stream-list-title">Señales Disponibles</div>
-            <ul class="stream-list" id="streamContainer"></ul>
-
             <div class="input-section">
-                <span class="input-label">Agregar Nueva Señal</span>
+                <span class="input-label">Agregar Nueva Señal / Canal</span>
                 <div class="form-group">
-                    <input type="text" id="streamTag" placeholder="Nombre (ej. Mi En Vivo)">
-                    <input type="text" id="streamUrl" placeholder="Link de streaming o de YouTube...">
+                    <input type="text" id="streamTag" placeholder="Nombre (ej. Mi Canal en Vivo)">
+                    <input type="text" id="streamUrl" placeholder="Link de YouTube: https://www.youtube.com/watch?v=... o https://youtu.be/...">
                 </div>
-                <button class="btn-primary btn-add" onclick="agregarStream()">+ Agregar a la Lista</button>
+                <button class="btn-primary btn-add" onclick="agregarStream()">+ Agregar y Visualizar</button>
             </div>
 
             <div class="text-center">
                 <button class="link-footer link-danger" onclick="cerrarSesion()">Cerrar Sesión</button>
             </div>
         </div>
-                        </div>
-                            <script>
-        const videoContainer = document.getElementById('videoPlayerContainer');
-        const statusBadge = document.getElementById('radioStatus');
-        const container = document.getElementById('streamContainer');
-        
-        const pantallas = {
-            loginBox: document.getElementById('loginBox'),
-            registerBox: document.getElementById('registerBox'),
-            recoverBox: document.getElementById('recoverBox'),
-            radioBox: document.getElementById('radioBox')
-        };
-
-        const DEFAULT_STREAMS = [
-            { id: 1, tag: "Video de Prueba", url: "https://youtube.com" }
-        ];
-
-        let listaStreams = [];
-
-        window.onload = function() {
-            const loginStatus = sessionStorage.getItem('isLogged');
-            const cuentaCreada = localStorage.getItem('userAccount');
-
-            if (loginStatus === "true") {
-                mostrarPantalla('radioBox');
-                inicializarReproductor();
-            } else if (!cuentaCreada) {
-                mostrarPantalla('registerBox');
-            } else {
-                mostrarPantalla('loginBox');
-            }
-        };
-
-        function mostrarPantalla(idPantalla) {
-            Object.keys(pantallas).forEach(key => {
-                pantallas[key].style.display = (key === idPantalla) ? "block" : "none";
-            });
-        }
-
-        function procesarRegistro() {
-            const user = document.getElementById('regUser').value.trim();
-            const pass = document.getElementById('regPass').value.trim();
-            const answer = document.getElementById('regAnswer').value.trim().toLowerCase();
-
-            if (user === "" || pass === "" || answer === "") {
-                alert("Por favor, completá todos los campos de registro.");
-                return;
-            }
-
-            const cuenta = { username: user, password: pass, securityAnswer: answer };
-            localStorage.setItem('userAccount', JSON.stringify(cuenta));
-            alert("¡Usuario registrado con éxito!");
-            mostrarPantalla('loginBox');
-        }
-
-        function validarLogin() {
-            const userIn = document.getElementById('username').value.trim();
-            const passIn = document.getElementById('password').value.trim();
-            const accountData = localStorage.getItem('userAccount');
-
-            if (!accountData) {
-                alert("No hay ningún usuario registrado todavía.");
-                mostrarPantalla('registerBox');
-                return;
-            }
-
-            const cuenta = JSON.parse(accountData);
-
-            if (userIn === cuenta.username && passIn === cuenta.password) {
-                sessionStorage.setItem('isLogged', "true");
-                mostrarPantalla('radioBox');
-                inicializarReproductor();
-            } else {
-                alert("Usuario o contraseña incorrectos.");
-            }
-        }
-
-        function procesarRecuperacion() {
-            const userIn = document.getElementById('recoverUser').value.trim();
-            const accountData = localStorage.getItem('userAccount');
-            if (!accountData) return;
-
-            const cuenta = JSON.parse(accountData);
-            if (userIn !== cuenta.username) {
-                alert("El usuario ingresado no coincide.");
-                return;
-            }
-
-            const respuestaUsuario = prompt("Pregunta de seguridad: ¿Cuál es el nombre de tu mascota favorita?");
-            if (respuestaUsuario && respuestaUsuario.toLowerCase().trim() === cuenta.securityAnswer) {
-                const nuevaClave = prompt("Escribí tu NUEVA contraseña:");
-                if (nuevaClave && nuevaClave.trim() !== "") {
-                    cuenta.password = nuevaClave.trim();
-                    localStorage.setItem('userAccount', JSON.stringify(cuenta));
-                    alert("¡Contraseña restablecida!");
-                    mostrarPantalla('loginBox');
-                }
-            }
-        }
-
-        function cerrarSesion() {
-            videoContainer.innerHTML = `<div style="color: white; text-align: center; padding-top: 25%; font-size: 14px;">Ninguna señal activa</div>`;
-            sessionStorage.removeItem('isLogged');
-            mostrarPantalla('loginBox');
-        }
-
-        function inicializarReproductor() {
-            const savedStreams = localStorage.getItem('multiStreamList');
-            if (savedStreams) {
-                listaStreams = JSON.parse(savedStreams);
-            } else {
-                listaStreams = [...DEFAULT_STREAMS];
-                guardarEnMemoria();
-            }
-            renderizarLista();
-        }
-
-        function renderizarLista() {
-            container.innerHTML = "";
-            if (listaStreams.length === 0) {
-                container.innerHTML = `<li style="color: #94a3b8; font-size: 13px; text-align: center; padding: 10px;">No hay canales cargados.</li>`;
-                return;
-            }
-            listaStreams.forEach(stream => {
-                const li = document.createElement('li');
-                li.className = 'stream-item';
-                li.innerHTML = `
-                    <div class="stream-info">
-                        <div class="stream-name">${stream.tag}</div>
-                        <div class="stream-url">${stream.url}</div>
-                    </div>
-                    <div class="actions">
-                        <button class="btn-action btn-connect" onclick="conectarSeñal('${stream.url}', '${stream.tag}')">Conectar</button>
-                        <button class="btn-action btn-delete" onclick="eliminarStream(${stream.id})">Quitar</button>
-                    </div>
-                `;
-                container.appendChild(li);
-            });
-        }
-
-        function agregarStream() {
-            const tagInput = document.getElementById('streamTag');
-            const urlInput = document.getElementById('streamUrl');
-            const tagValue = tagInput.value.trim();
-            const urlValue = urlInput.value.trim();
-
-            if (tagValue === "" || urlValue === "") {
-                alert("Por favor, completá los campos.");
-                return;
-            }
-
-            listaStreams.push({ id: Date.now(), tag: tagValue, url: urlValue });
-            guardarEnMemoria();
-            renderizarLista();
-            tagInput.value = "";
-            urlInput.value = "";
-        }
-
-        function eliminarStream(id) {
-            listaStreams = listaStreams.filter(item => item.id !== id);
-            guardarEnMemoria();
-            renderizarLista();
-        }
-
-        // --- EXTRACCIÓN AVANZADA CORREGIDA DE YOUTUBE ---
-        function obtenerYoutubeEmbedUrl(url) {
-            let videoId = null;
-            
-            try {
-                // Manejo de links tipo /live/
-                if (url.includes('/live/')) {
-                    let partes = url.split('/live/');
-                    if (partes[1]) videoId = partes[1].split(/[?#]/)[0];
-                } 
-                // Manejo de links tradicionales watch?v=
-                else if (url.includes('v=')) {
-                    let urlParams = new URLSearchParams(new URL(url).search);
-                    videoId = urlParams.get('v');
-                } 
-                // Manejo de links cortos youtu.be/
-                else if (url.includes('youtu.be/')) {
-                    let partes = url.split('youtu.be/');
-                    if (partes[1]) videoId = partes[1].split(/[?#]/)[0];
-                }
-            } catch (e) {
-                return null;
-            }
-
-            if (videoId && videoId.trim().length > 0) {
-                return "https://youtube.com" + videoId.trim() + "?autoplay=1";
-            }
-            return null;
-        }
-
-        function conectarSeñal(url, nombre) {
-            actualizarEstado(`Cargando: ${nombre}...`, "#fef9c3", "#a16207");
-            
-            const youtubeEmbed = obtenerYoutubeEmbedUrl(url);
-
-            if (youtubeEmbed) {
-                videoContainer.innerHTML = `<iframe src="${youtubeEmbed}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
-                actualizarEstado(`En vivo: ${nombre}`, "#dcfce7", "#15803d");
-            } else {
-                videoContainer.innerHTML = `<video controls autoplay style="width:100%; height:100%;"><source src="${url}" type="video/mp4">Tu navegador no soporta video.</video>`;
-                actualizarEstado(`En vivo (Directo): ${nombre}`, "#dcfce7", "#15803d");
-            }
-        }
-
-        function guardarEnMemoria() { localStorage.setItem('multiStreamList', JSON.stringify(listaStreams)); }
-        function actualizarEstado(texto, fondo, colorTexto) {
-            statusBadge.innerText = texto; statusBadge.style.backgroundColor = fondo; statusBadge.style.color = colorTexto;
-        }
-    </script>
-</body>
-    </html>
-
+    </div>
+    
