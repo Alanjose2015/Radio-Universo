@@ -59,12 +59,9 @@
         
         .status-badge {
             display: inline-block;
-            padding: 8px 16px;
-            border-radius: 50px;
-            font-size: 14px;
-            font-weight: 600;
-            background-color: #f1f5f9;
-            color: #64748b;
+            padding: 8px 16px; border-radius: 50px;
+            font-size: 14px; font-weight: 600;
+            background-color: #f1f5f9; color: #64748b;
             margin-bottom: 25px;
         }
         
@@ -369,6 +366,7 @@
             }
         };
 
+        // FUNCIÓN CLAVE PARA ACTIVAR EL BOTÓN
         function verificarCampos() {
             const usu = document.getElementById('usuario').value.trim();
             const cla = document.getElementById('clave').value.trim();
@@ -493,7 +491,6 @@
             });
         }
 
-        // 🔴 FUNCIÓN ARREGLADA AL 100%
         function iniciarTodasLasTransmisiones() {
             if (listaStreams.length === 0) { 
                 alert("⚠️ Agregá al menos una transmisión primero."); 
@@ -504,7 +501,6 @@
                 const vid = document.getElementById(`vid-${stream.id}`);
                 if (vid) {
                     if (vid.tagName === 'IFRAME') {
-                        // Recarga con parámetros forzados
                         let baseUrl = vid.src.split('?')[0];
                         vid.src = `${baseUrl}?autoplay=1&mute=0&rel=0&t=0`;
                     } else if (vid.tagName === 'VIDEO') {
@@ -522,42 +518,52 @@
 
         function extraerId(url) {
             try {
-                if (url.includes('/live/')) return url.split('/live/')[1].split(/[
-                            if (vid && vid.tagName === 'VIDEO') vid.volume = val / 100;
-    }
+                if (url.includes('/live/')) return url.split('/live/')[1].split(/[?#]/)[0];
+                if (url.includes('v=')) return new URLSearchParams(new URL(url
+        if (url.includes('/live/')) return url.split('/live/')[1].split(/[?#]/)[0];
+        if (url.includes('v=')) return new URLSearchParams(new URL(url).search).get('v');
+        if (url.includes('youtu.be/')) return url.split('youtu.be/')[1].split(/[?#]/)[0];
+    } catch (e) {}
+    return null;
+}
 
-    function darLike(id) {
-        likesData[id]++;
-        document.getElementById(`like-${id}`).textContent = likesData[id];
-        guardarLikes();
-    }
+function cambiarVolumen(id, val) {
+    const vid = document.getElementById(`vid-${id}`);
+    if (vid && vid.tagName === 'VIDEO') vid.volume = val / 100;
+}
 
-    function agregarStream() {
-        const tag = document.getElementById('streamTag').value.trim();
-        const url = document.getElementById('streamUrl').value.trim();
-        if (!tag || !url) { alert("Completá nombre y enlace."); return; }
+function darLike(id) {
+    likesData[id]++;
+    document.getElementById(`like-${id}`).textContent = likesData[id];
+    guardarLikes();
+}
 
-        listaStreams.push({ id: Date.now(), tag: tag, url: url });
-        guardarEnMemoria();
-        renderizarTodasLasTransmisiones();
-        document.getElementById('streamTag').value = "";
-        document.getElementById('streamUrl').value = "";
-    }
+function agregarStream() {
+    const tag = document.getElementById('streamTag').value.trim();
+    const url = document.getElementById('streamUrl').value.trim();
+    if (!tag || !url) { alert("Completá nombre y enlace."); return; }
 
-    function eliminarStream(id) {
-        listaStreams = listaStreams.filter(s => s.id !== id);
-        delete likesData[id];
-        guardarEnMemoria();
-        renderizarTodasLasTransmisiones();
-    }
+    listaStreams.push({ id: Date.now(), tag: tag, url: url });
+    guardarEnMemoria();
+    renderizarTodasLasTransmisiones();
+    document.getElementById('streamTag').value = "";
+    document.getElementById('streamUrl').value = "";
+}
 
-    function guardarEnMemoria() {
-        localStorage.setItem('multiStreamList', JSON.stringify(listaStreams));
-    }
+function eliminarStream(id) {
+    listaStreams = listaStreams.filter(s => s.id !== id);
+    delete likesData[id];
+    guardarEnMemoria();
+    renderizarTodasLasTransmisiones();
+}
 
-    function guardarLikes() {
-        localStorage.setItem('likesData', JSON.stringify(likesData));
-    }
+function guardarEnMemoria() {
+    localStorage.setItem('multiStreamList', JSON.stringify(listaStreams));
+}
+
+function guardarLikes() {
+    localStorage.setItem('likesData', JSON.stringify(likesData));
+}
 </script>
 </body>
 </html>
