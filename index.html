@@ -49,8 +49,10 @@
             margin-bottom: 25px;
         }
 
+        /* ✅ CORRECCIÓN CLAVE: Asegurar que las pantallas se muestren bien */
         .login-container, .register-container, .recover-container, .radio-container {
             display: none;
+            width: 100%;
         }
         .text-center { text-align: center; }
         .radio-header-icon { font-size: 48px; margin-bottom: 10px; display: block; }
@@ -329,7 +331,7 @@
                     <input type="text" id="streamUrl" placeholder="Link de YouTube: https://www.youtube.com/watch?v=... o https://youtu.be/...">
                 </div>
                 <button class="btn-primary btn-add" onclick="agregarStream()">+ Agregar y Visualizar</button>
-                <!-- BOTÓN CORREGIDO Y VISIBLE -->
+                <!-- BOTÓN ROJO FUNCIONANDO -->
                 <button class="btn-primary btn-start-all" onclick="iniciarTodasLasTransmisiones()">▶ INICIAR TODAS LAS TRANSMISIONES</button>
             </div>
 
@@ -510,7 +512,7 @@
             guardarLikes();
         }
 
-        // FUNCIÓN ARREGLADA Y FUNCIONANDO
+        // ✅ FUNCIÓN ARREGLADA Y SINCRONIZADA
         function iniciarTodasLasTransmisiones() {
             listaStreams.forEach(stream => {
                 const vid = document.getElementById(`vid-${stream.id}`);
@@ -523,7 +525,7 @@
                     }
                 }
             });
-            alert("✅ TODAS LAS TRANSMISIONES INICIADAS");
+            alert("✅ TODAS LAS TRANSMISIONES INICIADAS AL MISMO TIEMPO");
         }
 
         function extraerVideoIdYChatId(url) {
