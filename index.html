@@ -225,7 +225,8 @@
             cursor: pointer;
             margin-top: 10px;
         }
-        .btn-add { background-color: #10b981; }
+        .btn-add { background-color: #10b981; margin-bottom: 10px; }
+        .btn-start-all { background-color: #ef4444; color: white; font-weight: bold; }
         
         .link-footer {
             background: none;
@@ -356,6 +357,8 @@
                     <input type="text" id="streamUrl" placeholder="Link de YouTube: https://www.youtube.com/watch?v=... o https://youtu.be/...">
                 </div>
                 <button class="btn-primary btn-add" onclick="agregarStream()">+ Agregar y Visualizar</button>
+                <!-- BOTÓN NUEVO: INICIAR TODAS LAS TRANSMISIONES -->
+                <button class="btn-primary btn-start-all" onclick="iniciarTodasLasTransmisiones()">▶ INICIAR TODAS LAS TRANSMISIONES</button>
             </div>
 
             <div class="text-center">
@@ -533,6 +536,21 @@
                 allStreamsView.appendChild(card);
             });
             guardarLikes();
+        }
+
+        // FUNCIÓN NUEVA: INICIAR TODOS LOS VIDEOS AL MISMO TIEMPO
+        function iniciarTodasLasTransmisiones() {
+            listaStreams.forEach(stream => {
+                const vid = document.getElementById(`vid-${stream.id}`);
+                if (vid) {
+                    if (vid.tagName === 'IFRAME') {
+                        vid.src = vid.src; // Recarga para iniciar
+                    } else if (vid.tagName === 'VIDEO') {
+                        vid.play(); // Reproduce video directo
+                    }
+                }
+            });
+            alert("✅ Todas las transmisiones han sido iniciadas");
         }
 
         function extraerVideoIdYChatId(url) {
