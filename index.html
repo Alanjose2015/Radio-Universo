@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Control - Sistema Completo</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+        }
+        body {
+            background-color: #f1f2f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .radio-card {
+            background-color: #ffffff;
+            width: 100%;
+            max-width: 480px;
+            padding: 30px;
+            border-radius: 24px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e4e7eb;
+        }
+        /* Control de Pantallas */
+        .login-container, .register-container, .recover-container, .radio-container {
+            display: none;
+        }
+        .text-center { text-align: center; }
+        .radio-header-icon { font-size: 48px; margin-bottom: 10px; display: block; }
+        h2 { margin: 0 0 8px 0; font-size: 26px; color: #1e293b; font-weight: 800; }
+        p { color: #64748b; font-size: 14px; margin-bottom: 20px; }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 600;
+            background-color: #f1f5f9;
+            color: #64748b;
+            margin-bottom: 25px;
+        }
+        .input-section {
+            background-color: #f8fafc;
+            padding: 20px;
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 25px;
+        }
+        .input-label {
+            display: block;
+            text-align: left;
+            font-size: 13px;
+            font-weight: 700;
+            color: #475569;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+        .form-group { display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; }
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: 10px;
+            border: 2px solid #cbd5e1;
+            font-size: 15px;
+            outline: none;
+        }
+        input[type="text"]:focus, input[type="password"]:focus { border-color: #3b82f6; }
+        
+        .btn-primary {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            background-color: #3b82f6;
+            color: #ffffff;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .btn-add { background-color: #10b981; }
+        
+        .link-footer {
+            background: none;
+            border: none;
+            color: #64748b;
+            font-size: 13px;
+            font-weight: 500;
+            text-decoration: underline;
+            cursor: pointer;
+            margin-top: 15px;
+            display: inline-block;
+        }
+        .link-danger { color: #ef4444; }
+
+        .stream-list-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            margin: 0 0 10px 5px;
+        }
+        .stream-list { list-style: none; padding: 0; margin: 0 0 25px 0; max-height: 200px; overflow-y: auto; }
+        .stream-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
+            padding: 10px 14px;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            gap: 10px;
+        }
+        .stream-info { text-align: left; flex-grow: 1; overflow: hidden; }
+        .stream-name { font-weight: 600; color: #1e293b; font-size: 14px; }
+        .stream-url { font-size: 11px; color: #94a3b8; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .actions { display: flex; gap: 6px; }
+        .btn-action { border: none; padding: 8px 12px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; }
+        .btn-connect { background-color: #3b82f6; color: white; }
+        .btn-delete { background-color: #fee2e2; color: #ef4444; }
+        audio { width: 100%; outline: none; }
+    </style>
+</head>
+<body>
+
+    <div class="radio-card">
+        <!-- 1. PANTALLA DE LOGIN -->
+        <div id="loginBox" class="login-container">
+            <span class="radio-header-icon">🔒</span>
+            <h2>Iniciar Sesión</h2>
+            <p>Ingresá al panel de control</p>
+            <div class="input-section" style="margin-bottom: 0;">
+                <div class="form-group">
+                    <input type="text" id="username" placeholder="Usuario">
+                    <input type="password" id="password" placeholder="Contraseña">
+                </div>
+                <button class="btn-primary" onclick="validarLogin()">Ingresar al Panel</button>
+            </div>
+            <div class="text-center" style="display: flex; flex-direction: column; gap: 5px;">
+                <button class="link-footer" onclick="mostrarPantalla('recoverBox')">¿Olvidaste tu contraseña?</button>
+                <button class="link-footer" style="color: #3b82f6;" onclick="mostrarPantalla('registerBox')">¿No tenés cuenta? Registrate</button>
+            </div>
+        </div>
+
+        <!-- 2. PANTALLA DE REGISTRO -->
+        <div id="registerBox" class="register-container">
+            <span class="radio-header-icon">📝</span>
+            <h2>Crear Cuenta</h2>
+            <p>Registrá tus datos de administrador</p>
+            <div class="input-section" style="margin-bottom: 0;">
+                <div class="form-group">
+                    <input type="text" id="regUser" placeholder="Elegí un Usuario">
+                    <input type="password" id="regPass" placeholder="Elegí una Contraseña">
+                    <input type="text" id="regAnswer" placeholder="Respuesta de seguridad (Mascota favorita)">
+                </div>
+                <button class="btn-primary" style="background-color: #10b981;" onclick="procesarRegistro()">Registrar Cuenta</button>
+            </div>
+            <div class="text-center">
+                <button class="link-footer" onclick="mostrarPantalla('loginBox')">Volver al inicio de sesión</button>
+            </div>
+        </div>
+
+        <!-- 3. PANTALLA DE RECUPERACIÓN -->
+        <div id="recoverBox" class="recover-container">
+            <span class="radio-header-icon">🔑</span>
+            <h2>Recuperar Clave</h2>
+            <p>Ingresá tu usuario registrado para validar tu identidad</p>
+            <div class="input-section" style="margin-bottom: 0;">
+                <div class="form-group">
+                    <input type="text" id="recoverUser" placeholder="Escribí tu usuario aquí">
+                </div>
+                <button class="btn-primary" onclick="procesarRecuperacion()">Verificar Usuario</button>
+            </div>
+            <div class="text-center">
+                <button class="link-footer" onclick="mostrarPantalla('loginBox')">Volver al inicio de sesión</button>
+            </div>
+        </div>
+
+        <!-- 4. PANTALLA DEL REPRODUCTOR (Protegido) -->
+        <div id="radioBox" class="radio-container">
+            <div class="text-center">
+                <span class="radio-header-icon">🎙️</span>
+                <h2>Multitransmisión</h2>
+                <span class="status-badge" id="radioStatus">Seleccioná una señal</span>
+            </div>
+            
+            <div style="margin-bottom: 25px;">
+                <audio id="audioPlayer" controls></audio>
+            </div>
+
+            <div class="stream-list-title">Señales Disponibles</div>
+            <ul class="stream-list" id="streamContainer"></ul>
+
+            <div class="input-section">
+                <span class="input-label">Agregar Nueva Señal</span>
+                <div class="form-group">
+                    <input type="text" id="streamTag" placeholder="Nombre (ej. Invitado 1)">
+                    <input type="text" id="streamUrl" placeholder="Pegá el link de streaming aquí...">
+                </div>
+                <button class="btn-primary btn-add" onclick="agregarStream()">+ Agregar a la Lista</button>
+            </div>
+
+            <div class="text-center">
+                <button class="link-footer link-danger" onclick="cerrarSesion()">Cerrar Sesión</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        const player = document.getElementById('audioPlayer');
+        const statusBadge = document.getElementById('radioStatus');
+        const container = document.getElementById('streamContainer');
+        
+        const pantallas = {
+            loginBox: document.getElementById('loginBox'),
+            registerBox: document.getElementById('registerBox'),
+            recoverBox: document.getElementById('recoverBox'),
+            radioBox: document.getElementById('radioBox')
+        };
+
+        const DEFAULT_STREAMS = [
+            { id: 1, tag: "Señal de Prueba Musical", url: "https://radiojar.com" }
+        ];
+
+        let listaStreams = [];
+
+        // Al iniciar la página comprueba el estado técnico de las sesiones
+        window.onload = function() {
+            const loginStatus = sessionStorage.getItem('isLogged');
+            const cuentaCreada = localStorage.getItem('userAccount');
+
+            if (loginStatus === "true") {
+                mostrarPantalla('radioBox');
+                inicializarReproductor();
+            } else if (!cuentaCreada) {
+                // Si nunca se registró nadie, fuerza la pantalla de registro
+                mostrarPantalla('registerBox');
+            } else {
+                mostrarPantalla('loginBox');
+            }
+        };
+
+        function mostrarPantalla(idPantalla) {
+            Object.keys(pantallas).forEach(key => {
+                pantallas[key].style.display = (key === idPantalla) ? "block" : "none";
+            });
+        }
+
+        // Proceso de Registro de nueva cuenta
+        function procesarRegistro() {
+            const user = document.getElementById('regUser').value.trim();
+            const pass = document.getElementById('regPass').value.trim();
+            const answer = document.getElementById('regAnswer').value.trim().toLowerCase();
+
+            if (user === "" || pass === "" || answer === "") {
+                alert("Por favor, completá todos los campos de registro.");
+                return;
+            }
+
+            const cuenta = { username: user, password: pass, securityAnswer: answer };
+            localStorage.setItem('userAccount', JSON.stringify(cuenta));
+            
+            alert("¡Usuario registrado con éxito! Ya podés iniciar sesión.");
+            
+            // Limpia los campos de registro
+            document.getElementById('regUser').value = "";
+            document.getElementById('regPass').value = "";
+            document.getElementById('regAnswer').value = "";
+            
+            mostrarPantalla('loginBox');
+        }
+
+        // Valida el formulario de ingreso básico contra la memoria local
+        function validarLogin() {
+            const userIn = document.getElementById('username').value.trim();
+            const passIn = document.getElementById('password').value.trim();
+            const accountData = localStorage.getItem('userAccount');
+
+            if (!accountData) {
+                alert("No hay ningún usuario registrado todavía.");
+                mostrarPantalla('registerBox');
+                return;
+            }
+
+            const cuenta = JSON.parse(accountData);
+
+            if (userIn === cuenta.username && passIn === cuenta.password) {
+                sessionStorage.setItem('isLogged', "true");
+                mostrarPantalla('radioBox');
+                inicializarReproductor();
+            } else {
+                alert("Usuario o contraseña incorrectos.");
+            }
+        }
+
+        // Lógica interactiva para recuperar el acceso usando la respuesta guardada
+        function procesarRecuperacion() {
+            const userIn = document.getElementById('recoverUser').value.trim();
+            const accountData = localStorage.getItem('userAccount');
+
+            if (!accountData) {
+                alert("No existen usuarios en el sistema.");
+                return;
+            }
+
+            const cuenta = JSON.parse(accountData);
+
+            if (userIn !== cuenta.username) {
+                alert("El usuario ingresado no coincide con el registrado.");
+                return;
+            }
+
+            const respuestaUsuario = prompt("Pregunta de seguridad: ¿Cuál es el nombre de tu mascota favorita?\n\nEscribí tu respuesta:");
+            
+            if (respuestaUsuario && respuestaUsuario.toLowerCase().trim() === cuenta.securityAnswer) {
+                const nuevaClave = prompt("Identidad confirmada.\n\nEscribí tu NUEVA contraseña:");
+                if (nuevaClave && nuevaClave.trim() !== "") {
+                    cuenta.password = nuevaClave.trim();
+                    localStorage.setItem('userAccount', JSON.stringify(cuenta));
+                    alert("¡Contraseña restablecida con éxito! Iniciá sesión con tu nueva contraseña.");
+                    document.getElementById('recoverUser').value = "";
+                    mostrarPantalla('loginBox');
+                } else {
+                    alert("Operación cancelada. La contraseña no puede estar vacía.");
+                }
+            } else if (respuestaUsuario !== null) {
+                alert("Respuesta incorrecta. No se pudo validar tu identidad.");
+            }
+        }
+
+        function cerrarSesion() {
+            player.pause();
+            player.src = "";
+            sessionStorage.removeItem('isLogged');
+            document.getElementById('username').value = "";
+            document.getElementById('password').value = "";
+            mostrarPantalla('loginBox');
+        }
+
+        // --- SISTEMA INTERNO DEL REPRODUCTOR ---
+        function inicializarReproductor() {
+            const savedStreams = localStorage.getItem('multiStreamList');
+            if (savedStreams) {
+                listaStreams = JSON.parse(savedStreams);
+            } else {
+                listaStreams = [...DEFAULT_STREAMS];
+                guardarEnMemoria();
+            }
+            renderizarLista();
+        }
+
+        function renderizarLista() {
+            container.innerHTML = "";
+            if (listaStreams.length === 0) {
+                container.innerHTML = `<li style="color: #94a3b8; font-size: 13px; text-align: center; padding: 10px;">No hay transmisiones cargadas.</li>`;
+                return;
+            }
+            listaStreams.forEach(stream => {
+                const li = document.createElement('li');
+                li.className = 'stream-item';
+                li.innerHTML = `
+                    <div class="stream-info">
+                        <div class="stream-name">${stream.tag}</div>
+                        <div class="stream-url">${stream.url}</div>
+                    </div>
+                    <div class="actions">
+                        <button class="btn-action btn-connect" onclick="conectarSeñal('${stream.url}', '${stream.tag}')">Conectar</button>
+                        <button class="btn-action btn-delete" onclick="eliminarStream(${stream.id})">Quitar</button>
+                    </div>
+                `;
+                container.appendChild(li);
+            });
+        }
+
+        function agregarStream() {
+            const tagInput = document.getElementById('streamTag');
+            const urlInput = document.getElementById('streamUrl');
+            const tagValue = tagInput.value.trim();
+            const urlValue = urlInput.value.trim();
+
+            if (tagValue === "" || urlValue === "") {
+                alert("Por favor, completá tanto el Nombre como el Link.");
+                return;
+            }
+
+            listaStreams.push({ id: Date.now(), tag: tagValue, url: urlValue });
+            guardarEnMemoria();
+            renderizarLista();
+            tagInput.value = "";
+            urlInput.value = "";
+        }
+
+        function eliminarStream(id) {
+            listaStreams = listaStreams.filter(item => item.id !== id);
+            guardarEnMemoria();
+            renderizarLista();
+        }
+
+        function conectarSeñal(url, nombre) {
+            actualizarEstado(`Conectando a: ${nombre}...`, "#fef9c3", "#a16207");
+            player.src = url;
+            player.load();
+            player.play()
+                .then(() => { actualizarEstado(`En vivo: ${nombre}`, "#dcfce7", "#15803d"); })
+                .catch(error => {
+                    alert(`Error al conectar con "${nombre}". El flujo podría estar caído.`);
+                    actualizarEstado("Error de transmisión", "#fee2e2", "#b91c1c");
+                });
+        }
+
+        function guardarEnMemoria() { localStorage.setItem('multiStreamList', JSON.stringify(listaStreams)); }
+        function actualizarEstado(texto, fondo, colorTexto) {
+            statusBadge.innerText = texto; statusBadge.style.backgroundColor = fondo; statusBadge.style.color = colorTexto;
+        }
+    </script>
+</body>
+</html>
