@@ -27,7 +27,6 @@
             box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
             border: 1px solid #e4e7eb;
         }
-        /* Control de Pantallas */
         .login-container, .register-container, .recover-container, .radio-container {
             display: none;
         }
@@ -47,10 +46,10 @@
             margin-bottom: 25px;
         }
         
-        /* Contenedor del Reproductor de Video Adaptable */
+        /* Contenedor del Reproductor de Video Adaptable (16:9) */
         .video-wrapper {
             position: relative;
-            padding-bottom: 56.25%; /* Relación de aspecto 16:9 */
+            padding-bottom: 56.25%;
             height: 0;
             overflow: hidden;
             border-radius: 16px;
@@ -212,7 +211,7 @@
                 <span class="status-badge" id="radioStatus">Seleccioná una señal</span>
             </div>
             
-            <!-- Contenedor dinámico del reproductor de Video / YouTube -->
+            <!-- Ventana de Video Adaptable -->
             <div class="video-wrapper" id="videoPlayerContainer">
                 <div style="color: white; text-align: center; padding-top: 25%; font-size: 14px;">Ninguna señal activa</div>
             </div>
@@ -233,8 +232,8 @@
                 <button class="link-footer link-danger" onclick="cerrarSesion()">Cerrar Sesión</button>
             </div>
         </div>
-                </div>
-        <script>
+                        </div>
+                            <script>
         const videoContainer = document.getElementById('videoPlayerContainer');
         const statusBadge = document.getElementById('radioStatus');
         const container = document.getElementById('streamContainer');
@@ -246,7 +245,6 @@
             radioBox: document.getElementById('radioBox')
         };
 
-        // Enlace base inicial de prueba (Video oficial de ejemplo)
         const DEFAULT_STREAMS = [
             { id: 1, tag: "Video de Prueba", url: "https://youtube.com" }
         ];
@@ -340,7 +338,6 @@
             mostrarPantalla('loginBox');
         }
 
-        // --- SISTEMA DEL REPRODUCTOR MULTI-VIDEO ---
         function inicializarReproductor() {
             const savedStreams = localStorage.getItem('multiStreamList');
             if (savedStreams) {
@@ -355,7 +352,7 @@
         function renderizarLista() {
             container.innerHTML = "";
             if (listaStreams.length === 0) {
-                container.innerHTML = `<li style="color: #94a3b8; font-size: 13px; text-align: center; padding: 10px;">No hay canales de video cargados.</li>`;
+                container.innerHTML = `<li style="color: #94a3b8; font-size: 13px; text-align: center; padding: 10px;">No hay canales cargados.</li>`;
                 return;
             }
             listaStreams.forEach(stream => {
@@ -399,12 +396,32 @@
             renderizarLista();
         }
 
-        // Función inteligente: Detecta si es un link de YouTube y extrae el ID para incrustar el video correctamente
+        // --- EXTRACCIÓN AVANZADA CORREGIDA DE YOUTUBE ---
         function obtenerYoutubeEmbedUrl(url) {
-            let regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-            let match = url.match(regExp);
-            if (match && match[2].length == 11) {
-                return "https://youtube.com" + match[2] + "?autoplay=1";
+            let videoId = null;
+            
+            try {
+                // Manejo de links tipo /live/
+                if (url.includes('/live/')) {
+                    let partes = url.split('/live/');
+                    if (partes[1]) videoId = partes[1].split(/[?#]/)[0];
+                } 
+                // Manejo de links tradicionales watch?v=
+                else if (url.includes('v=')) {
+                    let urlParams = new URLSearchParams(new URL(url).search);
+                    videoId = urlParams.get('v');
+                } 
+                // Manejo de links cortos youtu.be/
+                else if (url.includes('youtu.be/')) {
+                    let partes = url.split('youtu.be/');
+                    if (partes[1]) videoId = partes[1].split(/[?#]/)[0];
+                }
+            } catch (e) {
+                return null;
+            }
+
+            if (videoId && videoId.trim().length > 0) {
+                return "https://youtube.com" + videoId.trim() + "?autoplay=1";
             }
             return null;
         }
@@ -415,11 +432,9 @@
             const youtubeEmbed = obtenerYoutubeEmbedUrl(url);
 
             if (youtubeEmbed) {
-                // Si es un link de YouTube, crea un iframe incrustado
                 videoContainer.innerHTML = `<iframe src="${youtubeEmbed}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
                 actualizarEstado(`En vivo: ${nombre}`, "#dcfce7", "#15803d");
             } else {
-                // Si es un link de streaming directo de video mp4/m3u8, usa la etiqueta clásica de video
                 videoContainer.innerHTML = `<video controls autoplay style="width:100%; height:100%;"><source src="${url}" type="video/mp4">Tu navegador no soporta video.</video>`;
                 actualizarEstado(`En vivo (Directo): ${nombre}`, "#dcfce7", "#15803d");
             }
@@ -431,4 +446,5 @@
         }
     </script>
 </body>
-</html>
+    </html>
+
