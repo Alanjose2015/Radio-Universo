@@ -3,254 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UNIVERSO STREAM - Multitransmisión en Vivo</title>
+    <title>Universo Stream</title>
     <style>
-        * {
-            box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-        }
+        /* Estilos base del sistema */
         body {
-            background-color: #f1f2f6;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            min-height: 100vh;
+            background-color: #0f172a;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             margin: 0;
-            padding: 20px;
+            padding: 50px;
+            color: #94a3b8;
+            font-size: 16px;
         }
         .radio-card {
-            background-color: #ffffff;
-            width: 100%;
-            max-width: 500px;
+            max-width: 900px;
+            margin: 0 auto;
+            background: #1e293b;
             padding: 30px;
-            border-radius: 24px;
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
-            border: 1px solid #e4e7eb;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
         }
-
         .main-title {
+            color: #f8fafc;
             text-align: center;
-            font-size: 32px;
-            font-weight: 900;
-            color: #1e293b;
-            margin: 0 0 10px 0;
-            background: linear-gradient(45deg, #3b82f6, #8b5cf6);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            font-size: 28px;
+            margin-bottom: 5px;
         }
         .main-subtitle {
+            color: #38bdf8;
             text-align: center;
+            margin-top: 0;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        .login-container {
+            max-width: 450px;
+            margin: 0 auto;
+            background: #0f172a;
+            padding: 25px;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid #334155;
+        }
+        .radio-header-icon {
+            font-size: 32px;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .login-container h2 {
+            color: #f8fafc;
+            margin: 0 0 5px 0;
+            font-size: 20px;
+        }
+        .login-container p {
             color: #64748b;
-            font-size: 15px;
-            margin-bottom: 25px;
+            margin: 0 0 20px 0;
+            font-size: 14px;
         }
-
-        .login-container, .register-container, .recover-container, .radio-container {
-            display: none;
-            width: 100%;
-        }
-        .text-center { text-align: center; }
-        .radio-header-icon { font-size: 48px; margin-bottom: 10px; display: block; }
-        h2 { margin: 0 0 8px 0; font-size: 26px; color: #1e293b; font-weight: 800; }
-        p { color: #64748b; font-size: 14px; margin-bottom: 20px; }
-        
-        .status-badge {
-            display: inline-block;
-            padding: 8px 16px; border-radius: 50px;
-            font-size: 14px; font-weight: 600;
-            background-color: #f1f5f9; color: #64748b;
-            margin-bottom: 25px;
-        }
-        
-        .all-streams-container {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            margin-bottom: 25px;
-        }
-
-        .stream-card {
-            background-color: #f8fafc;
-            border-radius: 16px;
-            border: 1px solid #e2e8f0;
-            padding: 15px;
+        .form-group {
             display: flex;
             flex-direction: column;
             gap: 12px;
+            margin-bottom: 20px;
         }
-        .stream-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .stream-title {
-            font-weight: 700;
-            color: #1e293b;
-            font-size: 16px;
-        }
-
-        .video-wrapper {
-            position: relative;
-            padding-bottom: 56.25%;
-            height: 0;
-            overflow: hidden;
-            border-radius: 12px;
-            background-color: #000;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-        .video-wrapper iframe, .video-wrapper video {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-
-        .stream-controls {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 10px;
-            padding: 8px 5px;
-        }
-        .volume-control {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .volume-control label {
-            font-size: 13px;
-            font-weight: 600;
-            color: #475569;
-        }
-        .volume-slider {
-            width: 100px;
-            height: 6px;
-            border-radius: 5px;
-            background: #cbd5e1;
-            outline: none;
-            -webkit-appearance: none;
-        }
-        .volume-slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 15px;
-            height: 15px;
-            border-radius: 50%;
-            background: #3b82f6;
-            cursor: pointer;
-        }
-        .btn-like {
-            background: none;
-            border: none;
-            font-size: 14px;
-            font-weight: 700;
-            color: #ef4444;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            padding: 6px 12px;
+        input {
+            background: #1e293b;
+            border: 1px solid #334155;
+            padding: 12px;
             border-radius: 8px;
-            transition: background 0.2s;
-        }
-        .btn-like:hover {
-            background-color: #fee2e2;
-        }
-        .like-count {
-            font-weight: bold;
-        }
-
-        .chat-wrapper {
-            height: 300px;
-            border-radius: 12px;
-            overflow: hidden;
-            border: 1px solid #e2e8f0;
-            background-color: white;
-        }
-        .chat-wrapper iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-
-        .input-section {
-            background-color: #f8fafc;
-            padding: 20px;
-            border-radius: 16px;
-            border: 1px solid #e2e8f0;
-            margin-bottom: 25px;
-        }
-        .input-label {
-            display: block;
-            text-align: left;
-            font-size: 13px;
-            font-weight: 700;
-            color: #475569;
-            text-transform: uppercase;
-            margin-bottom: 8px;
-        }
-        .form-group { display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; }
-        input[type="text"], input[type="password"] {
-            width: 100%;
-            padding: 12px 14px;
-            border-radius: 10px;
-            border: 2px solid #cbd5e1;
-            font-size: 15px;
+            color: #f8fafc;
+            font-size: 14px;
             outline: none;
-            transition: border-color 0.3s;
         }
-        input[type="text"]:focus, input[type="password"]:focus { border-color: #3b82f6; }
-        
+        input:focus {
+            border-color: #38bdf8;
+        }
         .btn-primary {
-            width: 100%;
-            padding: 14px;
+            background: #38bdf8;
+            color: #0f172a;
             border: none;
-            border-radius: 10px;
-            color: #ffffff;
-            font-size: 15px;
-            font-weight: 700;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 600;
             cursor: pointer;
-            margin-top: 10px;
-            transition: background 0.3s;
+            width: 100%;
+            font-size: 14px;
+            transition: all 0.2s;
         }
         .btn-primary:disabled {
-            background-color: #cbd5e1 !important;
+            background: #334155;
+            color: #64748b;
             cursor: not-allowed;
         }
-        .btn-primary.activo {
-            background-color: #3b82f6 !important;
-            cursor: pointer;
-        }
-        .btn-add { background-color: #10b981; margin-bottom: 10px; }
-        .btn-add:hover { background-color: #059669; }
-        .btn-start-all { background-color: #ef4444; color: white; font-weight: bold; font-size: 16px; padding: 16px; }
-        .btn-start-all:hover { background-color: #dc2626; }
-        .btn-delete { background-color: #fee2e2; color: #ef4444; border: none; padding: 8px 12px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; }
-        
         .link-footer {
             background: none;
             border: none;
             color: #64748b;
-            font-size: 13px;
-            font-weight: 500;
-            text-decoration: underline;
             cursor: pointer;
-            margin-top: 15px;
-            display: inline-block;
+            font-size: 13px;
+            text-decoration: underline;
+            padding: 5px;
         }
-        .link-danger { color: #ef4444; }
-        .link-blue { color: #3b82f6; }
-
-        .empty-state {
-            text-align: center;
-            padding: 50px;
-            color: #94a3b8;
-            font-size: 16px;
+        .link-blue {
+            color: #38bdf8;
+        }
+        .streams-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        .stream-card {
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
     </style>
 </head>
@@ -260,310 +129,274 @@
         <h1 class="main-title">UNIVERSO STREAM</h1>
         <p class="main-subtitle">Tu plataforma de Multitransmisión en Vivo</p>
 
-        <!-- LOGIN -->
+        <!-- PANTALLA: INICIO DE SESIÓN -->
         <div id="loginBox" class="login-container" style="display:block;">
             <span class="radio-header-icon">🔒</span>
             <h2>Iniciar Sesión</h2>
             <p>Ingresá al panel de control</p>
             <div class="input-section" style="margin-bottom: 0;">
                 <div class="form-group">
-                    <input type="text" id="usuario" placeholder="Usuario" value="Alan2015" oninput="verificarCampos()">
+                    <input type="text" id="usuario" placeholder="Usuario" oninput="verificarCampos()">
                     <input type="password" id="clave" placeholder="Contraseña" oninput="verificarCampos()">
                 </div>
                 <button id="botonIngresar" class="btn-primary" disabled onclick="entrarAlSistema()">Ingresar al Panel</button>
             </div>
-            <div class="text-center" style="display: flex; flex-direction: column; gap: 5px;">
+            <div class="text-center" style="display: flex; flex-direction: column; gap: 5px; margin-top: 15px;">
                 <button class="link-footer" onclick="mostrarPantalla('recoverBox')">¿Olvidaste tu contraseña?</button>
                 <button class="link-footer link-blue" onclick="mostrarPantalla('registerBox')">¿No tenés cuenta? Registrate</button>
             </div>
         </div>
 
-        <!-- REGISTRO -->
-        <div id="registerBox" class="register-container">
+        <!-- PANTALLA: REGISTRO -->
+        <div id="registerBox" class="login-container" style="display:none;">
             <span class="radio-header-icon">📝</span>
             <h2>Crear Cuenta</h2>
-            <p>Registrá tus datos de administrador</p>
-            <div class="input-section" style="margin-bottom: 0;">
+            <p>Registrate para acceder a la plataforma</p>
+            <div class="input-section">
                 <div class="form-group">
-                    <input type="text" id="regUser" placeholder="Elegí un Usuario">
-                    <input type="password" id="regPass" placeholder="Elegí una Contraseña">
-                    <input type="text" id="regAnswer" placeholder="Respuesta de seguridad (Mascota favorita)">
+                    <input type="text" id="regUsuario" placeholder="Escribí un Usuario">
+                    <input type="password" id="regClave" placeholder="Escribí una Contraseña">
                 </div>
-                <button class="btn-primary" style="background-color: #10b981;" onclick="procesarRegistro()">Registrar Cuenta</button>
+                <button class="btn-primary" onclick="guardarRegistro()">Registrarse</button>
             </div>
-            <div class="text-center">
-                <button class="link-footer" onclick="mostrarPantalla('loginBox')">Volver al inicio de sesión</button>
-            </div>
+            <button class="link-footer" onclick="mostrarPantalla('loginBox')" style="margin-top: 15px;">¿Ya tenés cuenta? Iniciá Sesión</button>
         </div>
 
-        <!-- RECUPERAR -->
-        <div id="recoverBox" class="recover-container">
+        <!-- PANTALLA: RECUPERAR CONTRASEÑA -->
+        <div id="recoverBox" class="login-container" style="display:none;">
             <span class="radio-header-icon">🔑</span>
             <h2>Recuperar Clave</h2>
-            <p>Ingresá tu usuario registrado para validar tu identidad</p>
-            <div class="input-section" style="margin-bottom: 0;">
-                <div class="form-group">
-                    <input type="text" id="recoverUser" placeholder="Escribí tu usuario aquí">
-                </div>
-                <button class="btn-primary" style="background-color: #f59e0b;" onclick="procesarRecuperacion()">Verificar Usuario</button>
-            </div>
-            <div class="text-center">
-                <button class="link-footer" onclick="mostrarPantalla('loginBox')">Volver al inicio de sesión</button>
-            </div>
-        </div>
-
-        <!-- PANEL DE CONTROL -->
-        <div id="radioBox" class="radio-container">
-            <div class="text-center">
-                <span class="radio-header-icon">🌌</span>
-                <h2>Panel de Control</h2>
-                <span class="status-badge">Todas las señales activas</span>
-            </div>
-            
-            <div id="allStreamsView" class="all-streams-container">
-                <div class="empty-state">🌌 El universo está vacío... Agregá una transmisión para comenzar.</div>
-            </div>
-
+            <p>Ingresá tu usuario para restablecer</p>
             <div class="input-section">
-                <span class="input-label">Agregar Nueva Señal / Canal</span>
                 <div class="form-group">
-                    <input type="text" id="streamTag" placeholder="Nombre (ej. Mi Canal en Vivo)">
-                    <input type="text" id="streamUrl" placeholder="Link de YouTube: https://www.youtube.com/watch?v=... o https://youtu.be/...">
+                    <input type="text" id="recUsuario" placeholder="Tu Usuario">
                 </div>
-                <button class="btn-primary btn-add" onclick="agregarStream()">+ Agregar y Visualizar</button>
-                <button class="btn-primary btn-start-all" onclick="iniciarTodasLasTransmisiones()">▶ INICIAR TODAS LAS TRANSMISIONES</button>
+                <button class="btn-primary" onclick="alert('✉️ Si el usuario existe, se enviaron las instrucciones.')">Restablecer Contraseña</button>
             </div>
-
-            <div class="text-center">
-                <button class="link-footer link-danger" onclick="cerrarSesion()">Cerrar Sesión</button>
-            </div>
+            <button class="link-footer" onclick="mostrarPantalla('loginBox')" style="margin-top: 15px;">Volver al Inicio</button>
         </div>
-    </div>
 
+        <!-- PANTALLA: PANEL OPERATIVO (Aparece al loguearse) -->
+        <div id="panelBox" style="display:none; margin-top: 20px; padding: 20px; border-radius: 12px; background: #0f172a; border: 1px solid #334155;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h3 style="color: #fff; margin: 0;">🎛️ Panel de Control de Transmisiones</h3>
+                <button class="link-footer link-blue" onclick="cerrarSesion()" style="text-decoration: none; font-weight: bold;">🚪 Cerrar Sesión</button>
+            </div>
+            <div class="form-group">
+                <input type="text" id="streamTag" placeholder="Nombre de la transmisión">
+                <input type="text" id="streamUrl" placeholder="Enlace de YouTube (Ej: https://youtube.com...)">
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn-primary" onclick="agregarStream()">➕ Agregar Transmisión</button>
+                <button class="btn-primary" style="background: #ef4444; color: white;" onclick="iniciarTodoMuted()">🔊 Iniciar Todo (Muted)</button>
+            </div>
+            
+            <!-- Contenedor dinámico donde se inyectan los videos -->
+            <div id="streamsGrid" class="streams-grid"></div>
+        </div>
+
+    </div> <!-- Cierre de .radio-card -->
     <script>
-        const allStreamsView = document.getElementById('allStreamsView');
-        const pantallas = {
-            loginBox: document.getElementById('loginBox'),
-            registerBox: document.getElementById('registerBox'),
-            recoverBox: document.getElementById('recoverBox'),
-            radioBox: document.getElementById('radioBox')
-        };
+    // Variables globales (Sincronizadas con localStorage)
+    let listaStreams = JSON.parse(localStorage.getItem('multiStreamList')) || [];
+    let likesData = JSON.parse(localStorage.getItem('likesData')) || {};
 
-        let listaStreams = [];
-        let likesData = {};
+    // Al cargar la página, limpiamos los campos y validamos el estado inicial del botón
+    document.addEventListener("DOMContentLoaded", () => {
+        if(document.getElementById('usuario')) document.getElementById('usuario').value = "";
+        if(document.getElementById('clave')) document.getElementById('clave').value = "";
+        verificarCampos();
+    });
 
-        window.onload = function() {
-            const loginStatus = sessionStorage.getItem('isLogged');
-            const cuentaCreada = localStorage.getItem('userAccount');
+    // 1. Control de navegación entre pantallas
+    function mostrarPantalla(pantallaId) {
+        const pantallas = ['loginBox', 'registerBox', 'recoverBox', 'panelBox'];
+        pantallas.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.style.display = (id === pantallaId) ? 'block' : 'none';
+        });
+    }
 
-            if (loginStatus === "true") {
-                mostrarPantalla('radioBox');
-                inicializarReproductor();
-            } else if (!cuentaCreada) {
-                mostrarPantalla('registerBox');
-            } else {
-                mostrarPantalla('loginBox');
-            }
-        };
+    // 2. Validación en tiempo real para activar el botón de login
+    function verificarCampos() {
+        const usuario = document.getElementById('usuario')?.value.trim() || "";
+        const clave = document.getElementById('clave')?.value.trim() || "";
+        const boton = document.getElementById('botonIngresar');
+        
+        if (boton) {
+            boton.disabled = (usuario === "" || clave === "");
+        }
+    }
 
-        // FUNCIÓN CLAVE PARA ACTIVAR EL BOTÓN
-        function verificarCampos() {
-            const usu = document.getElementById('usuario').value.trim();
-            const cla = document.getElementById('clave').value.trim();
-            const boton = document.getElementById('botonIngresar');
+    // 3. Sistema de Registro Local
+    function guardarRegistro() {
+        const regUser = document.getElementById('regUsuario').value.trim();
+        const regPass = document.getElementById('regClave').value.trim();
+
+        if (regUser === "" || regPass === "") {
+            alert("❌ Por favor, completá todos los campos del registro.");
+            return;
+        }
+
+        localStorage.setItem('usuarioRegistrado', regUser);
+        localStorage.setItem('claveRegistrada', regPass);
+        
+        alert("✅ ¡Registro exitoso! Ya podés iniciar sesión con tus datos.");
+        mostrarPantalla('loginBox');
+        
+        document.getElementById('usuario').value = regUser;
+        verificarCampos();
+    }
+
+    // 4. Validación de Entrada al Sistema
+    function entrarAlSistema() {
+        const usuario = document.getElementById('usuario').value.trim();
+        const clave = document.getElementById('clave').value.trim();
+
+        const usuarioValido = localStorage.getItem('usuarioRegistrado');
+        const claveValida = localStorage.getItem('claveRegistrada');
+
+        if (!usuarioValido) {
+            alert("❌ No hay cuentas creadas en este navegador. Registrate primero.");
+            return;
+        }
+
+        if (usuario === usuarioValido && clave === claveValida) {
+            alert("🔑 ¡Acceso concedido! Bienvenido.");
             
-            if (usu !== "" && cla !== "") {
-                boton.disabled = false;
-                boton.classList.add('activo');
-            } else {
-                boton.disabled = true;
-                boton.classList.remove('activo');
-            }
-        }
-
-        function mostrarPantalla(id) {
-            Object.keys(pantallas).forEach(key => {
-                pantallas[key].style.display = (key === id) ? "block" : "none";
-            });
-        }
-
-        function procesarRegistro() {
-            const user = document.getElementById('regUser').value.trim();
-            const pass = document.getElementById('regPass').value.trim();
-            const answer = document.getElementById('regAnswer').value.trim().toLowerCase();
-
-            if (user === "" || pass === "" || answer === "") {
-                alert("Por favor, completá todos los campos.");
-                return;
-            }
-
-            localStorage.setItem('userAccount', JSON.stringify({ usuario: user, clave: pass, respuesta: answer }));
-            alert("¡Registrado con éxito! Ahora podés ingresar.");
-            mostrarPantalla('loginBox');
-        }
-
-        function entrarAlSistema() {
-            const userIn = document.getElementById('usuario').value.trim();
-            const passIn = document.getElementById('clave').value.trim();
-            const guardado = localStorage.getItem('userAccount');
-
-            if (!guardado) {
-                alert("No hay cuenta. Registrate primero.");
-                mostrarPantalla('registerBox');
-                return;
-            }
-
-            const datos = JSON.parse(guardado);
-
-            if (userIn === datos.usuario && passIn === datos.clave) {
-                sessionStorage.setItem('isLogged', "true");
-                mostrarPantalla('radioBox');
-                inicializarReproductor();
-            } else {
-                alert("❌ Usuario o contraseña incorrectos");
-            }
-        }
-
-        function procesarRecuperacion() {
-            const userIn = document.getElementById('recoverUser').value.trim();
-            const guardado = localStorage.getItem('userAccount');
-            if (!guardado) return;
-
-            const datos = JSON.parse(guardado);
-            if (userIn !== datos.usuario) {
-                alert("Usuario no encontrado.");
-                return;
-            }
-
-            const res = prompt("¿Cuál es tu mascota favorita?");
-            if (res && res.toLowerCase().trim() === datos.respuesta) {
-                const nueva = prompt("Escribí tu NUEVA contraseña:");
-                if (nueva) {
-                    datos.clave = nueva.trim();
-                    localStorage.setItem('userAccount', JSON.stringify(datos));
-                    alert("Contraseña cambiada.");
-                    mostrarPantalla('loginBox');
-                }
-            }
-        }
-
-        function cerrarSesion() {
-            sessionStorage.removeItem('isLogged');
-            mostrarPantalla('loginBox');
-        }
-
-        function inicializarReproductor() {
-            const saved = localStorage.getItem('multiStreamList');
-            if (saved) listaStreams = JSON.parse(saved);
+            document.getElementById('loginBox').style.display = 'none';
+            document.getElementById('panelBox').style.display = 'block';
+            
             renderizarTodasLasTransmisiones();
+        } else {
+            alert("❌ Credenciales incorrectas. Verificá los datos.");
+            document.getElementById('clave').value = "";
+            verificarCampos();
         }
+    }
 
-        function renderizarTodasLasTransmisiones() {
-            allStreamsView.innerHTML = "";
-            if (listaStreams.length === 0) {
-                allStreamsView.innerHTML = `<div class="empty-state">🌌 El universo está vacío... Agregá una transmisión para comenzar.</div>`;
-                return;
-            }
+    // 5. Cierre de Sesión (Vuelve al inicio de manera limpia)
+    function cerrarSesion() {
+        document.getElementById('usuario').value = "";
+        document.getElementById('clave').value = "";
+        mostrarPantalla('loginBox');
+        verificarCampos();
+    }
 
-            listaStreams.forEach(stream => {
-                const id = stream.id;
-                const vidId = extraerId(stream.url);
-
-                if (!likesData[id]) likesData[id] = 0;
-
-                const card = document.createElement('div');
-                card.className = 'stream-card';
-                card.innerHTML = `
-                    <div class="stream-header">
-                        <h3 class="stream-title">${stream.tag}</h3>
-                        <button class="btn-like" onclick="darLike(${id})">❤️ <span class="like-count" id="like-${id}">${likesData[id]}</span></button>
-                    </div>
-                    <div class="video-wrapper">
-                        ${vidId ? `<iframe id="vid-${id}" src="https://www.youtube.com/embed/${vidId}?autoplay=1&mute=1&rel=0" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe>` : `<video id="vid-${id}" controls src="${stream.url}" autoplay muted></video>`}
-                    </div>
-                    <div class="stream-controls">
-                        <div class="volume-control">🔊 <input type="range" class="volume-slider" min="0" max="100" value="100" oninput="cambiarVolumen(${id}, this.value)"></div>
-                        <button class="btn-delete" onclick="eliminarStream(${id})">Eliminar</button>
-                    </div>
-                    ${vidId ? `<div class="chat-wrapper"><iframe src="https://www.youtube.com/live_chat?v=${vidId}&embed_domain=${window.location.hostname}" allowfullscreen></iframe></div>` : '<p style="text-align:center; color:#888; font-size:12px;">Chat no disponible</p>'}
-                `;
-                allStreamsView.appendChild(card);
-            });
-        }
-
-        function iniciarTodasLasTransmisiones() {
-            if (listaStreams.length === 0) { 
-                alert("⚠️ Agregá al menos una transmisión primero."); 
-                return; 
-            }
-            
-            listaStreams.forEach(stream => {
-                const vid = document.getElementById(`vid-${stream.id}`);
-                if (vid) {
-                    if (vid.tagName === 'IFRAME') {
-                        let baseUrl = vid.src.split('?')[0];
-                        vid.src = `${baseUrl}?autoplay=1&mute=0&rel=0&t=0`;
-                    } else if (vid.tagName === 'VIDEO') {
-                        vid.currentTime = 0;
-                        vid.play().catch(e => {
-                            console.log("Error reproduciendo:", e);
-                            vid.muted = false;
-                            vid.play();
-                        });
-                    }
+    // 6. Funciones Operativas de Transmisiones (Tus funciones originales reparadas)
+    function iniciarTodoMuted() {
+        if (listaStreams.length === 0) return;
+        
+        listaStreams.forEach(stream => {
+            const vid = document.getElementById(`vid-${stream.id}`);
+            if (vid) {
+                if (vid.tagName === 'IFRAME') {
+                    let baseUrl = vid.src.split('?')[0];
+                    vid.src = `${baseUrl}?autoplay=1&mute=0&rel=0&t=0`;
+                } else if (vid.tagName === 'VIDEO') {
+                    vid.currentTime = 0;
+                    vid.play().catch(e => {
+                        console.log("Error reproduciendo:", e);
+                        vid.muted = false;
+                        vid.play();
+                    });
                 }
-            });
-            alert("✅ SI LA TRANSMISIÓN YA ESTÁ EN VIVO, AHORA ESTÁ INICIADA. Si dice 'esperando', es porque aún no empezó.");
+            }
+        });
+        alert("✅ SI LA TRANSMISIÓN YA ESTÁ EN VIVO, AHORA ESTÁ INICIADA. Si dice 'esperando', es porque aún no empezó.");
+    }
+
+    function extraerId(url) {
+        try {
+            if (url.includes('/live/')) return url.split('/live/')[1].split(/[?#]/)[0];
+            if (url.includes('v=')) return new URLSearchParams(new URL(url).search).get('v');
+            if (url.includes('youtu.be/')) return url.split('youtu.be/')[1].split(/[?#]/)[0];
+        } catch (e) {
+            console.error("Error al extraer ID de URL:", e);
+        }
+        return null;
+    }
+
+    function cambiarVolumen(id, val) {
+        const vid = document.getElementById(`vid-${id}`);
+        if (vid && vid.tagName === 'VIDEO') vid.volume = val / 100;
+    }
+
+    function darLike(id) {
+        if (!likesData[id]) likesData[id] = 0;
+        likesData[id]++;
+        document.getElementById(`like-${id}`).textContent = likesData[id];
+        guardarLikes();
+    }
+
+    function agregarStream() {
+        const tag = document.getElementById('streamTag').value.trim();
+        const url = document.getElementById('streamUrl').value.trim();
+        if (!tag || !url) { alert("Completá nombre y enlace."); return; }
+
+        listaStreams.push({ id: Date.now(), tag: tag, url: url });
+        guardarEnMemoria();
+        renderizarTodasLasTransmisiones();
+        document.getElementById('streamTag').value = "";
+        document.getElementById('streamUrl').value = "";
+    }
+
+    function eliminarStream(id) {
+        listaStreams = listaStreams.filter(s => s.id !== id);
+        delete likesData[id];
+        guardarEnMemoria();
+        renderizarTodasLasTransmisiones();
+    }
+
+    function guardarEnMemoria() {
+        localStorage.setItem('multiStreamList', JSON.stringify(listaStreams));
+    }
+
+    // 7. Renderizado Dinámico de la Grilla de Videos
+    function renderizarTodasLasTransmisiones() {
+        const grid = document.getElementById('streamsGrid');
+        if (!grid) return;
+        
+        grid.innerHTML = ""; 
+
+        if (listaStreams.length === 0) {
+            grid.innerHTML = "<p style='text-align:center; color:#64748b; grid-column:1/-1; padding: 20px;'>No hay transmisiones activas. Agregá una arriba.</p>";
+            return;
         }
 
-        function extraerId(url) {
-            try {
-                if (url.includes('/live/')) return url.split('/live/')[1].split(/[?#]/)[0];
-                if (url.includes('v=')) return new URLSearchParams(new URL(url
-        if (url.includes('/live/')) return url.split('/live/')[1].split(/[?#]/)[0];
-        if (url.includes('v=')) return new URLSearchParams(new URL(url).search).get('v');
-        if (url.includes('youtu.be/')) return url.split('youtu.be/')[1].split(/[?#]/)[0];
-    } catch (e) {}
-    return null;
-}
+        listaStreams.forEach(stream => {
+            if (!likesData[stream.id]) likesData[stream.id] = 0;
+            const videoId = extraerId(stream.url);
+            
+            const card = document.createElement('div');
+            card.className = "stream-card";
 
-function cambiarVolumen(id, val) {
-    const vid = document.getElementById(`vid-${id}`);
-    if (vid && vid.tagName === 'VIDEO') vid.volume = val / 100;
-}
+            let reproductorHTML = "";
+            if (videoId) {
+                reproductorHTML = `<iframe id="vid-${stream.id}" width="100%" height="200" src="https://youtube.com{videoId}?enablejsapi=1" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen style="border-radius:6px;"></iframe>`;
+            } else {
+                reproductorHTML = `<video id="vid-${stream.id}" src="${stream.url}" controls width="100%" height="200" style="border-radius:6px; background:black;"></video>`;
+            }
 
-function darLike(id) {
-    likesData[id]++;
-    document.getElementById(`like-${id}`).textContent = likesData[id];
-    guardarLikes();
-}
+            card.innerHTML = `
+                <h4 style="color:#f8fafc; margin:0; font-size:16px;">${stream.tag}</h4>
+                ${reproductorHTML}
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:5px;">
+                    <button class="btn-primary" style="width:auto; padding:6px 12px; background:#10b981; color:white;" onclick="darLike(${stream.id})">
+                        👍 Likes: <span id="like-${stream.id}">${likesData[stream.id]}</span>
+                    </button>
+                    <button class="btn-primary" style="width:auto; padding:6px 12px; background:#ef4444; color:white;" onclick="eliminarStream(${stream.id})">
+                        🗑️ Eliminar
+                    </button>
+                </div>
+            `;
+            grid.appendChild(card);
+        });
+    }
 
-function agregarStream() {
-    const tag = document.getElementById('streamTag').value.trim();
-    const url = document.getElementById('streamUrl').value.trim();
-    if (!tag || !url) { alert("Completá nombre y enlace."); return; }
-
-    listaStreams.push({ id: Date.now(), tag: tag, url: url });
-    guardarEnMemoria();
-    renderizarTodasLasTransmisiones();
-    document.getElementById('streamTag').value = "";
-    document.getElementById('streamUrl').value = "";
-}
-
-function eliminarStream(id) {
-    listaStreams = listaStreams.filter(s => s.id !== id);
-    delete likesData[id];
-    guardarEnMemoria();
-    renderizarTodasLasTransmisiones();
-}
-
-function guardarEnMemoria() {
-    localStorage.setItem('multiStreamList', JSON.stringify(listaStreams));
-}
-
-function guardarLikes() {
-    localStorage.setItem('likesData', JSON.stringify(likesData));
-}
+    function guardarLikes() {
+        localStorage.setItem('likesData', JSON.stringify(likesData));
+    }
 </script>
 </body>
 </html>
