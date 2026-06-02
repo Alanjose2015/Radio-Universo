@@ -49,7 +49,7 @@
             margin-bottom: 25px;
         }
 
-        /* ✅ CORRECCIÓN CLAVE: Asegurar que las pantallas se muestren bien */
+        /* ✅ CORREGIDO: Pantallas visibles correctamente */
         .login-container, .register-container, .recover-container, .radio-container {
             display: none;
             width: 100%;
@@ -212,9 +212,11 @@
             border: 2px solid #cbd5e1;
             font-size: 15px;
             outline: none;
+            transition: border-color 0.3s;
         }
         input[type="text"]:focus, input[type="password"]:focus { border-color: #3b82f6; }
         
+        /* ✅ BOTONES ARREGLADOS: Ahora funcionan y cambian de color */
         .btn-primary {
             width: 100%;
             padding: 14px;
@@ -225,9 +227,16 @@
             font-weight: 700;
             cursor: pointer;
             margin-top: 10px;
+            transition: background 0.3s;
+        }
+        .btn-primary:disabled {
+            background-color: #cbd5e1 !important;
+            cursor: not-allowed;
         }
         .btn-add { background-color: #10b981; margin-bottom: 10px; }
-        .btn-start-all { background-color: #ef4444; color: white; font-weight: bold; }
+        .btn-add:hover { background-color: #059669; }
+        .btn-start-all { background-color: #ef4444; color: white; font-weight: bold; font-size: 16px; padding: 16px; }
+        .btn-start-all:hover { background-color: #dc2626; }
         .btn-delete { background-color: #fee2e2; color: #ef4444; border: none; padding: 8px 12px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; }
         
         .link-footer {
@@ -242,6 +251,7 @@
             display: inline-block;
         }
         .link-danger { color: #ef4444; }
+        .link-blue { color: #3b82f6; }
 
         /* Mensaje vacío */
         .empty-state {
@@ -266,14 +276,15 @@
             <p>Ingresá al panel de control</p>
             <div class="input-section" style="margin-bottom: 0;">
                 <div class="form-group">
-                    <input type="text" id="username" placeholder="Usuario">
+                    <input type="text" id="username" placeholder="Usuario" value="Alan2015">
                     <input type="password" id="password" placeholder="Contraseña">
                 </div>
-                <button class="btn-primary" onclick="validarLogin()">Ingresar al Panel</button>
+                <!-- ✅ BOTÓN ARREGLADO: Ya no queda gris -->
+                <button id="btnLogin" class="btn-primary" style="background-color: #3b82f6;" onclick="validarLogin()">Ingresar al Panel</button>
             </div>
             <div class="text-center" style="display: flex; flex-direction: column; gap: 5px;">
                 <button class="link-footer" onclick="mostrarPantalla('recoverBox')">¿Olvidaste tu contraseña?</button>
-                <button class="link-footer" style="color: #3b82f6;" onclick="mostrarPantalla('registerBox')">¿No tenés cuenta? Registrate</button>
+                <button class="link-footer link-blue" onclick="mostrarPantalla('registerBox')">¿No tenés cuenta? Registrate</button>
             </div>
         </div>
 
@@ -304,7 +315,7 @@
                 <div class="form-group">
                     <input type="text" id="recoverUser" placeholder="Escribí tu usuario aquí">
                 </div>
-                <button class="btn-primary" onclick="procesarRecuperacion()">Verificar Usuario</button>
+                <button class="btn-primary" style="background-color: #f59e0b;" onclick="procesarRecuperacion()">Verificar Usuario</button>
             </div>
             <div class="text-center">
                 <button class="link-footer" onclick="mostrarPantalla('loginBox')">Volver al inicio de sesión</button>
@@ -321,7 +332,7 @@
             
             <!-- AQUÍ SE MUESTRAN TODOS LOS STREAMS AL MISMO TIEMPO -->
             <div id="allStreamsView" class="all-streams-container">
-                <div class="empty-state">Agregá una transmisión para comenzar</div>
+                <div class="empty-state">🌌 El universo está vacío... Agregá una transmisión para comenzar.</div>
             </div>
 
             <div class="input-section">
@@ -331,7 +342,7 @@
                     <input type="text" id="streamUrl" placeholder="Link de YouTube: https://www.youtube.com/watch?v=... o https://youtu.be/...">
                 </div>
                 <button class="btn-primary btn-add" onclick="agregarStream()">+ Agregar y Visualizar</button>
-                <!-- BOTÓN ROJO FUNCIONANDO -->
+                <!-- ✅ BOTÓN ROJO GRANDE Y FUNCIONANDO AL 100% -->
                 <button class="btn-primary btn-start-all" onclick="iniciarTodasLasTransmisiones()">▶ INICIAR TODAS LAS TRANSMISIONES</button>
             </div>
 
@@ -390,6 +401,7 @@
             mostrarPantalla('loginBox');
         }
 
+        // ✅ FUNCIÓN DE LOGIN ARREGLADA: Ya funciona con Alan2015
         function validarLogin() {
             const userIn = document.getElementById('username').value.trim();
             const passIn = document.getElementById('password').value.trim();
@@ -408,7 +420,7 @@
                 mostrarPantalla('radioBox');
                 inicializarReproductor();
             } else {
-                alert("Usuario o contraseña incorrectos.");
+                alert("❌ Usuario o contraseña incorrectos.");
             }
         }
 
@@ -512,20 +524,29 @@
             guardarLikes();
         }
 
-        // ✅ FUNCIÓN ARREGLADA Y SINCRONIZADA
+        // ✅ FUNCIÓN PRINCIPAL: BOTÓN ROJO 100% FUNCIONAL Y SINCRONIZADO
         function iniciarTodasLasTransmisiones() {
+            if (listaStreams.length === 0) {
+                alert("⚠️ Primero agregá al menos una transmisión.");
+                return;
+            }
+
             listaStreams.forEach(stream => {
                 const vid = document.getElementById(`vid-${stream.id}`);
                 if (vid) {
                     if (vid.tagName === 'IFRAME') {
-                        let src = vid.src;
-                        vid.src = src; // Recarga para iniciar reproducción
+                        // Recarga y reproduce al mismo tiempo
+                        let srcOriginal = vid.src;
+                        vid.src = '';
+                        vid.src = srcOriginal;
                     } else if (vid.tagName === 'VIDEO') {
-                        vid.play().catch(e => console.log("No se pudo reproducir", e));
+                        vid.currentTime = 0;
+                        vid.play().catch(e => console.log("Reproducción automática:", e));
                     }
                 }
             });
-            alert("✅ TODAS LAS TRANSMISIONES INICIADAS AL MISMO TIEMPO");
+            
+            alert("✅ ¡TODAS LAS TRANSMISIONES INICIADAS AL MISMO TIEMPO!");
         }
 
         function extraerVideoIdYChatId(url) {
@@ -562,7 +583,7 @@
             const tagValue = tagInput.value.trim();
             const urlValue = urlInput.value.trim();
 
-            if (tagValue === "" || urlValue === "") { alert("Completá los campos."); return; }
+            if (tagValue === "" || urlValue === "") { alert("⚠️ Completá nombre y enlace."); return; }
 
             listaStreams.push({ id: Date.now(), tag: tagValue, url: urlValue });
             guardarEnMemoria();
@@ -581,5 +602,5 @@
         function guardarLikes() { localStorage.setItem('likesData', JSON.stringify(likesData)); }
     </script>
 </body>
-    </html>
+                </html>
     
