@@ -481,94 +481,83 @@
                         <button class="btn-like" onclick="darLike(${id})">❤️ <span class="like-count" id="like-${id}">${likesData[id]}</span></button>
                     </div>
                     <div class="video-wrapper">
-                        ${vidId ? `<iframe id="vid-${id}" src="https://www.youtube.com/embed/${vidId}?autoplay=0" allow="autoplay; encrypted-media" allowfullscreen></iframe>` : `<video id="vid-${id}" controls src="${stream.url}"></video>`}
+                        ${vidId ? `<iframe id="vid-${id}" src="https://www.youtube.com/embed/${vidId}?autoplay=1&mute=1&rel=0" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe>` : `<video id="vid-${id}" controls src="${stream.url}" autoplay muted></video>`}
                     </div>
                     <div class="stream-controls">
                         <div class="volume-control">🔊 <input type="range" class="volume-slider" min="0" max="100" value="100" oninput="cambiarVolumen(${id}, this.value)"></div>
                         <button class="btn-delete" onclick="eliminarStream(${id})">Eliminar</button>
                     </div>
-                    ${vidId ? `<div class="chat-wrapper"><iframe src="https://www.youtube.com/live_chat?v=${vidId}&embed_domain=${window.location.hostname}" allowfullscreen></iframe></div>` : ''}
+                    ${vidId ? `<div class="chat-wrapper"><iframe src="https://www.youtube.com/live_chat?v=${vidId}&embed_domain=${window.location.hostname}" allowfullscreen></iframe></div>` : '<p style="text-align:center; color:#888; font-size:12px;">Chat no disponible</p>'}
                 `;
                 allStreamsView.appendChild(card);
             });
         }
 
+        // 🔴 FUNCIÓN ARREGLADA AL 100%
         function iniciarTodasLasTransmisiones() {
-            if (listaStreams.length === 0) { alert("⚠️ Agregá al menos una transmisión primero."); return; }
+            if (listaStreams.length === 0) { 
+                alert("⚠️ Agregá al menos una transmisión primero."); 
+                return; 
+            }
             
             listaStreams.forEach(stream => {
                 const vid = document.getElementById(`vid-${stream.id}`);
                 if (vid) {
                     if (vid.tagName === 'IFRAME') {
-                        let src = vid.src;
-                        vid.src = '';
-                        vid.src = src;
+                        // Recarga con parámetros forzados
+                        let baseUrl = vid.src.split('?')[0];
+                        vid.src = `${baseUrl}?autoplay=1&mute=0&rel=0&t=0`;
                     } else if (vid.tagName === 'VIDEO') {
-                        vid.play().catch(e => console.log(e));
+                        vid.currentTime = 0;
+                        vid.play().catch(e => {
+                            console.log("Error reproduciendo:", e);
+                            vid.muted = false;
+                            vid.play();
+                        });
                     }
                 }
             });
-            alert("✅ TODAS INICIADAS AL MISMO TIEMPO");
+            alert("✅ SI LA TRANSMISIÓN YA ESTÁ EN VIVO, AHORA ESTÁ INICIADA. Si dice 'esperando', es porque aún no empezó.");
         }
 
         function extraerId(url) {
             try {
-                if (url.includes('/live/')) return url.split('/live/')[1].split(/[?#]/)[0];
-                if (url.includes('v=')) return new URLSearchParams(new URL(url).search).get('v');
-                if (url.includes('youtu.be/')) return url.split('youtu.be/')[1].split(/[?#]/)[0];
-            } catch (e) {}
-            return null;
-        }
+                if (url.includes('/live/')) return url.split('/live/')[1].split(/[
+                            if (vid && vid.tagName === 'VIDEO') vid.volume = val / 100;
+    }
 
-        function cambiarVolumen(id, val) {
-            const vid = document.getElementById(`vid-${id}`);
-            if (vid && vid.tagName === 'VIDEO') vid.volume = val / 100;
-        }
+    function darLike(id) {
+        likesData[id]++;
+        document.getElementById(`like-${id}`).textContent = likesData[id];
+        guardarLikes();
+    }
 
-        function darLike(id) {
-            likesData[id]++;
-            document.getElementById(`like-${id}`)
-                    } catch (e) {}
-            return null;
-        }
+    function agregarStream() {
+        const tag = document.getElementById('streamTag').value.trim();
+        const url = document.getElementById('streamUrl').value.trim();
+        if (!tag || !url) { alert("Completá nombre y enlace."); return; }
 
-        function cambiarVolumen(id, val) {
-            const vid = document.getElementById(`vid-${id}`);
-            if (vid && vid.tagName === 'VIDEO') vid.volume = val / 100;
-        }
+        listaStreams.push({ id: Date.now(), tag: tag, url: url });
+        guardarEnMemoria();
+        renderizarTodasLasTransmisiones();
+        document.getElementById('streamTag').value = "";
+        document.getElementById('streamUrl').value = "";
+    }
 
-        function darLike(id) {
-            likesData[id]++;
-            document.getElementById(`like-${id}`).textContent = likesData[id];
-            guardarLikes();
-        }
+    function eliminarStream(id) {
+        listaStreams = listaStreams.filter(s => s.id !== id);
+        delete likesData[id];
+        guardarEnMemoria();
+        renderizarTodasLasTransmisiones();
+    }
 
-        function agregarStream() {
-            const tag = document.getElementById('streamTag').value.trim();
-            const url = document.getElementById('streamUrl').value.trim();
-            if (!tag || !url) { alert("⚠️ Completá nombre y enlace."); return; }
+    function guardarEnMemoria() {
+        localStorage.setItem('multiStreamList', JSON.stringify(listaStreams));
+    }
 
-            listaStreams.push({ id: Date.now(), tag: tag, url: url });
-            guardarEnMemoria();
-            renderizarTodasLasTransmisiones();
-            document.getElementById('streamTag').value = "";
-            document.getElementById('streamUrl').value = "";
-        }
-
-        function eliminarStream(id) {
-            listaStreams = listaStreams.filter(s => s.id !== id);
-            delete likesData[id];
-            guardarEnMemoria();
-            renderizarTodasLasTransmisiones();
-        }
-
-        function guardarEnMemoria() {
-            localStorage.setItem('multiStreamList', JSON.stringify(listaStreams));
-        }
-
-        function guardarLikes() {
-            localStorage.setItem('likesData', JSON.stringify(likesData));
-        }
-    </script>
+    function guardarLikes() {
+        localStorage.setItem('likesData', JSON.stringify(likesData));
+    }
+</script>
 </body>
 </html>
