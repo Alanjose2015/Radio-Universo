@@ -361,4 +361,230 @@
             </div>
         </div>
     </div>
-    
+       <script>
+        const allStreamsView = document.getElementById('allStreamsView');
+        
+        const pantallas = {
+            loginBox: document.getElementById('loginBox'),
+            registerBox: document.getElementById('registerBox'),
+            recoverBox: document.getElementById('recoverBox'),
+            radioBox: document.getElementById('radioBox')
+        };
+
+        const DEFAULT_STREAMS = [];
+        let listaStreams = [];
+        let likesData = {};
+
+        window.onload = function() {
+            const loginStatus = sessionStorage.getItem('isLogged');
+            const cuentaCreada = localStorage.getItem('userAccount');
+
+            if (loginStatus === "true") {
+                mostrarPantalla('radioBox');
+                inicializarReproductor();
+            } else if (!cuentaCreada) {
+                mostrarPantalla('registerBox');
+            } else {
+                mostrarPantalla('loginBox');
+            }
+        };
+
+        function mostrarPantalla(idPantalla) {
+            Object.keys(pantallas).forEach(key => {
+                pantallas[key].style.display = (key === idPantalla) ? "block" : "none";
+            });
+        }
+
+        function procesarRegistro() {
+            const user = document.getElementById('regUser').value.trim();
+            const pass = document.getElementById('regPass').value.trim();
+            const answer = document.getElementById('regAnswer').value.trim().toLowerCase();
+
+            if (user === "" || pass === "" || answer === "") {
+                alert("Por favor, completá todos los campos de registro.");
+                return;
+            }
+
+            const cuenta = { username: user, password: pass, securityAnswer: answer };
+            localStorage.setItem('userAccount', JSON.stringify(cuenta));
+            alert("¡Usuario registrado con éxito!");
+            mostrarPantalla('loginBox');
+        }
+
+        function validarLogin() {
+            const userIn = document.getElementById('username').value.trim();
+            const passIn = document.getElementById('password').value.trim();
+            const accountData = localStorage.getItem('userAccount');
+
+            if (!accountData) {
+                alert("No hay ningún usuario registrado todavía.");
+                mostrarPantalla('registerBox');
+                return;
+            }
+
+            const cuenta = JSON.parse(accountData);
+
+            if (userIn === cuenta.username && passIn === cuenta.password) {
+                sessionStorage.setItem('isLogged', "true");
+                mostrarPantalla('radioBox');
+                inicializarReproductor();
+            } else {
+                alert("Usuario o contraseña incorrectos.");
+            }
+        }
+
+        function procesarRecuperacion() {
+            const userIn = document.getElementById('recoverUser').value.trim();
+            const accountData = localStorage.getItem('userAccount');
+            if (!accountData) return;
+
+            const cuenta = JSON.parse(accountData);
+            if (userIn !== cuenta.username) {
+                alert("El usuario ingresado no coincide.");
+                return;
+            }
+
+            const respuestaUsuario = prompt("Pregunta de seguridad: ¿Cuál es el nombre de tu mascota favorita?");
+            if (respuestaUsuario && respuestaUsuario.toLowerCase().trim() === cuenta.securityAnswer) {
+                const nuevaClave = prompt("Escribí tu NUEVA contraseña:");
+                if (nuevaClave && nuevaClave.trim() !== "") {
+                    cuenta.password = nuevaClave.trim();
+                    localStorage.setItem('userAccount', JSON.stringify(cuenta));
+                    alert("¡Contraseña restablecida!");
+                    mostrarPantalla('loginBox');
+                }
+            }
+        }
+
+        function cerrarSesion() {
+            sessionStorage.removeItem('isLogged');
+            mostrarPantalla('loginBox');
+        }
+
+        function inicializarReproductor() {
+            const savedStreams = localStorage.getItem('multiStreamList');
+            const savedLikes = localStorage.getItem('likesData');
+            
+            if (savedStreams) {
+                listaStreams = JSON.parse(savedStreams);
+            } else {
+                listaStreams = [...DEFAULT_STREAMS];
+                guardarEnMemoria();
+            }
+
+            if(savedLikes) {
+                likesData = JSON.parse(savedLikes);
+            }
+            
+            renderizarTodasLasTransmisiones();
+        }
+
+        function renderizarTodasLasTransmisiones() {
+            allStreamsView.innerHTML = "";
+
+            if (listaStreams.length === 0) {
+                allStreamsView.innerHTML = `<div class="empty-state">🌌 El universo está vacío... Agregá una transmisión para comenzar.</div>`;
+                return;
+            }
+
+            listaStreams.forEach(stream => {
+                const streamId = stream.id;
+                const videoIds = extraerVideoIdYChatId(stream.url);
+
+                if (!likesData[streamId]) likesData[streamId] = 0;
+
+                const card = document.createElement('div');
+                card.className = 'stream-card';
+                card.innerHTML = `
+                    <div class="stream-header">
+                        <h3 class="stream-title">${stream.tag}</h3>
+                        <button class="btn-like" onclick="darLike(${streamId})">
+                            ❤️ <span class="like-count" id="like-num-${streamId}">${likesData[streamId]}</span>
+                        </button>
+                    </div>
+
+                    <div class="video-wrapper">
+                        ${ videoIds.videoId ? 
+                            `<iframe id="vid-${streamId}" src="https://www.youtube.com/embed/${videoIds.videoId}?autoplay=1&enablejsapi=1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>` 
+                            : 
+                            `<video id="vid-${streamId}" controls autoplay style="width:100%; height:100%;"><source src="${stream.url}" type="video/mp4">Tu navegador no soporta video.</video>` 
+                        }
+                    </div>
+
+                    <div class="stream-controls">
+                        <div class="volume-control">
+                            <label>🔊 Volumen:</label>
+                            <input type="range" class="volume-slider" min="0" max="100" value="100" 
+                                   oninput="cambiarVolumen(${streamId}, this.value)">
+                        </div>
+                        <button class="btn-action btn-delete" onclick="eliminarStream(${streamId})">Eliminar</button>
+                    </div>
+
+                    ${ videoIds.chatId ? 
+                        `<div class="chat-wrapper">
+                            <iframe src="https://www.youtube.com/live_chat?v=${videoIds.chatId}&embed_domain=${window.location.hostname}" allowfullscreen></iframe>
+                         </div>` 
+                        : 
+                        `<div style="font-size:12px; color:#94a3b8; padding: 10px; text-align:center;">Chat no disponible</div>` 
+                    }
+                `;
+                allStreamsView.appendChild(card);
+            });
+            guardarLikes();
+        }
+
+        function extraerVideoIdYChatId(url) {
+            let videoId = null;
+            try {
+                if (url.includes('/live/')) {
+                    let partes = url.split('/live/');
+                    if (partes[1]) videoId = partes[1].split(/[?#]/)[0];
+                } else if (url.includes('v=')) {
+                    let urlParams = new URLSearchParams(new URL(url).search);
+                    videoId = urlParams.get('v');
+                } else if (url.includes('youtu.be/')) {
+                    let partes = url.split('youtu.be/');
+                    if (partes[1]) videoId = partes[1].split(/[?#]/)[0];
+                }
+            } catch (e) {}
+            return { videoId: videoId && videoId.length === 11 ? videoId : null, chatId: videoId };
+        }
+
+        function cambiarVolumen(id, valor) {
+            const vid = document.getElementById(`vid-${id}`);
+            if (vid && vid.tagName === 'VIDEO') vid.volume = valor / 100;
+        }
+
+        function darLike(id) {
+            likesData[id]++;
+            document.getElementById(`like-num-${id}`).innerText = likesData[id];
+            guardarLikes();
+        }
+
+        function agregarStream() {
+            const tagInput = document.getElementById('streamTag');
+            const urlInput = document.getElementById('streamUrl');
+            const tagValue = tagInput.value.trim();
+            const urlValue = urlInput.value.trim();
+
+            if (tagValue === "" || urlValue === "") { alert("Completá los campos."); return; }
+
+            listaStreams.push({ id: Date.now(), tag: tagValue, url: urlValue });
+            guardarEnMemoria();
+            renderizarTodasLasTransmisiones();
+            tagInput.value = ""; urlInput.value = "";
+        }
+
+        function eliminarStream(id) {
+            listaStreams = listaStreams.filter(item => item.id !== id);
+            delete likesData[id];
+            guardarEnMemoria();
+            renderizarTodasLasTransmisiones();
+        }
+
+        function guardarEnMemoria() { localStorage.setItem('multiStreamList', JSON.stringify(listaStreams)); }
+        function guardarLikes() { localStorage.setItem('likesData', JSON.stringify(likesData)); }
+    </script>
+</body>
+</html>
+
